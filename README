@@ -1,1 +1,2 @@
-This is a test
+This will be a Chrome plugin to persistently monitor Event Tracking requests made to GA
+for easy testing of sites during development.
