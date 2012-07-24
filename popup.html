@@ -1,21 +1,97 @@
-<style>
-body {
-  min-width:357px;
-  overflow-x:hidden;
-}
+<html>
+<head>
+	<style>
+	* {
+		font-family: helvetica,sans-serif;
+		margin: 0;
+		padding: 0;
+	}
+	h1 {
+		font-size: 18px;
+		color: #888888;
+		font-weight: 100;
+		padding: 4px;
+		margin: 4px;
+	}
+	th {
+		font-size: 14px;
+		color: #444444;
+		font-weight: 100;
+		white-space: nowrap;
+		border-bottom: 1px solid #aaaaaa;
+		padding: 4px;
+		margin: 4px;
+	}
+	td {
+		font-size: 12px;
+		color: #000000;
+		font-weight: 300;
+		white-space: nowrap;
+		padding: 4px;
+		margin: 4px;
+	}
+	tr:nth-child(even) td {
+		background-color: #eeeeff;
+	}
+	tr:nth-child(odd) td {
+		background-color: #eeeeee;
+	}
+	</style>
+    <script>
+        // This callback function is called when the content script has been 
+        // injected and returned its results
+        function onPageInfo(o) 
+        { 
+        	
+        } 
 
-img {
-  margin:5px;
-  border:2px solid black;
-  vertical-align:middle;
-  width:75px;
-  height:75px;
-}
-</style>
+        // POST the data to the server using XMLHttpRequest
+        function addBookmark(f)
+        {
+            return false;
+        }
 
-<script>
-alert('heya');
-console.log('heya');
-document.write('hello world');
-
-</script>
+        // Call the getPageInfo function in the background page, passing in 
+        // our onPageInfo function as the callback
+        window.onload = function() 
+        { 
+            var bg = chrome.extension.getBackgroundPage();
+            bg.getPageInfo(onPageInfo);
+        }
+    </script>
+</head>
+<body>
+	<h1>Google Events</h1>
+	<table>
+		<thead>
+			<tr>
+				<th>URL</th>
+				<th>UA String</th>
+				<th>Category</th>
+				<th>Action</th>
+				<th>Label</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr id="nothingyet">
+				<td colspan="5" align="center"><i>Nothing Yet</i></td>
+			</tr>
+			<tr id="nothingyet">
+				<td colspan="5" align="center"><i>Nothing Yet!</i></td>
+			</tr>
+			<tr id="nothingyet">
+				<td colspan="5" align="center"><i>Nothing Yet</i></td>
+			</tr>
+			<tr id="nothingyet">
+				<td colspan="5" align="center"><i>Nothing Yet</i></td>
+			</tr>
+			<tr id="nothingyet">
+				<td colspan="5" align="center"><i>Nothing Yet</i></td>
+			</tr>
+			<tr id="nothingyet">
+				<td colspan="5" align="center"><i>Nothing Yet</i></td>
+			</tr>
+		</tbody>
+	</table>
+</body>
+</html>
