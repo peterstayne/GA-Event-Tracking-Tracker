@@ -1,7 +1,7 @@
 <script>
     // Array to hold callback functions
     var callbacks = []; 
-
+    var eventObject = [];
     /**
      * Credit
      * http://stackoverflow.com/questions/901115/get-query-string-values-in-javascript/901144#901144
@@ -49,15 +49,29 @@
           }
         }
         if(details.url.indexOf('_utm') > -1) {
-            var referer = '';
-            var eventString = '';
+            var referer, eventString, uacode;
+            var category, action, label, val;
+
+            referer = eventString = uacode = category = action = label = val = '<i>null</i>';
+
             for(var i in details.requestHeaders) {
                 if(details.requestHeaders[i].name == "Referer") {
                     referer = details.requestHeaders[i].value;
                 }
             }
-            if(eventString = getParameterByName(details.url, 'utme')) {
-                console.log('event found', referer, eventString);
+            eventString = getParameterByName(details.url, 'utme')
+            if(eventString.substr(0,1) === '5') {
+                eventString = eventString.substring(2, eventString.length - 1).split(/\*|\)\(/);
+                category = eventString[0];
+                action = eventString[1];
+                if(eventString.length > 2) {
+                    label = eventString[2]; 
+                    if(eventString.length > 3) {
+                        val = eventString[3]; 
+                    }
+                }
+                uacode = getParameterByName(details.url, 'utmac');
+                eventObject.push([referer, uacode, category, action, label, val]);
             }
         }
         return {requestHeaders: details.requestHeaders};

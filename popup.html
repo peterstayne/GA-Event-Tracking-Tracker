@@ -51,12 +51,29 @@
             return false;
         }
 
+        function updateList() {
+            var bgeo = chrome.extension.getBackgroundPage().eventObject;
+            var newhtml = '';
+            for(var i in bgeo) {
+            	console.log(bgeo[i])
+            	newhtml += '<tr>';
+            	newhtml += '<td>' + bgeo[i][0] + '</td>';
+            	newhtml += '<td>' + bgeo[i][1] + '</td>';
+            	newhtml += '<td>' + bgeo[i][2] + '</td>';
+            	newhtml += '<td>' + bgeo[i][3] + '</td>';
+            	newhtml += '<td>' + bgeo[i][4] + '</td>';
+            	newhtml += '<td>' + bgeo[i][5] + '</td>';
+            	newhtml += '</tr>';
+            }
+            document.getElementById('event-list').innerHTML = newhtml;
+        }
+
         // Call the getPageInfo function in the background page, passing in 
         // our onPageInfo function as the callback
         window.onload = function() 
         { 
-            var bg = chrome.extension.getBackgroundPage();
-            bg.getPageInfo(onPageInfo);
+        	updateList();
+        	setInterval(updateList, 1000);
         }
     </script>
 </head>
@@ -70,9 +87,10 @@
 				<th>Category</th>
 				<th>Action</th>
 				<th>Label</th>
+				<th>Value</th>
 			</tr>
 		</thead>
-		<tbody>
+		<tbody id="event-list">
 			<tr id="nothingyet">
 				<td colspan="5" align="center"><i>Nothing Yet</i></td>
 			</tr>
