@@ -54,17 +54,29 @@
         function updateList() {
             var bgeo = chrome.extension.getBackgroundPage().eventObject;
             var newhtml = '';
-            for(var i in bgeo) {
-            	console.log(bgeo[i])
-            	newhtml += '<tr>';
-            	newhtml += '<td>' + bgeo[i][0] + '</td>';
-            	newhtml += '<td>' + bgeo[i][1] + '</td>';
-            	newhtml += '<td>' + bgeo[i][2] + '</td>';
-            	newhtml += '<td>' + bgeo[i][3] + '</td>';
-            	newhtml += '<td>' + bgeo[i][4] + '</td>';
-            	newhtml += '<td>' + bgeo[i][5] + '</td>';
-            	newhtml += '</tr>';
-            }
+            if(bgeo.length) {
+            	var countUntil;
+            	if(bgeo.length > 15) {
+            		countUntil = bgeo.length - 15;
+            	} else {
+            		countUntil = -1;
+            	}
+	            for(var i = bgeo.length-1; i > countUntil; i--) {
+	            	if(bgeo[i][0].length > 37) {
+	            		bgeo[i][0] = bgeo[i][0].substr(0, 32) + ' ...';
+	            	}
+	            	newhtml += '<tr>';
+	            	newhtml += '<td>' + bgeo[i][0] + '</td>';
+	            	newhtml += '<td>' + bgeo[i][1] + '</td>';
+	            	newhtml += '<td>' + bgeo[i][2] + '</td>';
+	            	newhtml += '<td>' + bgeo[i][3] + '</td>';
+	            	newhtml += '<td>' + bgeo[i][4] + '</td>';
+	            	newhtml += '<td>' + bgeo[i][5] + '</td>';
+	            	newhtml += '</tr>';
+	            }
+	        } else {
+	        	newhtml = '<tr><td colspan="6" align="center"><i>Nothing Yet</i></td></tr>';
+	        }
             document.getElementById('event-list').innerHTML = newhtml;
         }
 
@@ -92,7 +104,7 @@
 		</thead>
 		<tbody id="event-list">
 			<tr>
-				<td colspan="5" align="center"><i>Nothing Yet</i></td>
+				<td colspan="6" align="center"><i>Nothing Yet</i></td>
 			</tr>
 		</tbody>
 	</table>

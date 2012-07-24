@@ -60,7 +60,11 @@
                 }
             }
             eventString = getParameterByName(details.url, 'utme')
+
             if(eventString.substr(0,1) === '5') {
+                if(eventString.indexOf(')8(') > -1) eventString = eventString.substring(0, eventString.indexOf(')8(') + 1);
+                if(eventString.indexOf(')9(') > -1) eventString = eventString.substring(0, eventString.indexOf(')9(') + 1);
+                if(eventString.indexOf(')11(') > -1) eventString = eventString.substring(0, eventString.indexOf(')11(') + 1);
                 eventString = eventString.substring(2, eventString.length - 1).split(/\*|\)\(/);
                 category = eventString[0];
                 action = eventString[1];
