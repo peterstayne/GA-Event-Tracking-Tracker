@@ -5,6 +5,7 @@
 		font-family: helvetica,sans-serif;
 		margin: 0;
 		padding: 0;
+		border: 0;
 	}
 	h1 {
 		font-size: 18px;
@@ -74,10 +75,17 @@
 	            	newhtml += '<td>' + bgeo[i][5] + '</td>';
 	            	newhtml += '</tr>';
 	            }
+	            newhtml += '<tr><td colspan="6" align="center"><a href="javascript:void(0)" id="reset-list">Reset List</a></td></tr>';
+	            document.getElementById('event-list').innerHTML = newhtml;
+	            document.getElementById('reset-list').onclick = function() {
+	            	chrome.extension.getBackgroundPage().eventObject = [];
+	            	updateList();
+	            };
 	        } else {
 	        	newhtml = '<tr><td colspan="6" align="center"><i>Nothing Yet</i></td></tr>';
+	            document.getElementById('event-list').innerHTML = newhtml;
 	        }
-            document.getElementById('event-list').innerHTML = newhtml;
+
         }
 
         // Call the getPageInfo function in the background page, passing in 
