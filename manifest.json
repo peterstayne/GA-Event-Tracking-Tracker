@@ -1,11 +1,16 @@
 {
-	"name": "Google Event Tracking Tracker",
-	"version": "1.0",
+	"name": "Event Tracking Tracker",
+	"version": "1.0.1",
 	"description": "Plugin to track GA Event Tracker event calls that persists across pages",
 	"background_page": "background.html",
 	"browser_action": {
-	    "default_icon": "icon.png",
+	    "default_icon": "ett.png",
 	    "popup": "popup.html"
+  	},
+  	"icons": {
+  		"16": "ett16.png",
+  		"48": "ett48.png",
+  		"128": "ett.png"
   	},
 	"background_page": "background.html",
 	"permissions": [
