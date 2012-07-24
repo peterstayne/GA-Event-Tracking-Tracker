@@ -1,2 +1,6 @@
-This will be a Chrome plugin to persistently monitor Event Tracking requests made to GA
+Google Chrome browser plugin to persistently monitor Event Tracking requests made to GA
 for easy testing of sites during development.
+
+Available in the Chrome Web Store at https://chrome.google.com/webstore/detail/npjkfahkbgoagkfpkidpjdemjjmmbcim
+
+Test and comments and pull requests welcome!
