@@ -42,15 +42,29 @@
     }); 
     chrome.webRequest.onBeforeSendHeaders.addListener(
       function(details) {
+        var referer, eventString, uacode;
+        var category, action, label, val;
         for (var i = 0; i < details.requestHeaders.length; ++i) {
           if (details.requestHeaders[i].name === 'User-Agent') {
             details.requestHeaders.splice(i, 1);
             break;
           }
         }
-        if(details.url.indexOf('_utm') > -1) {
-            var referer, eventString, uacode;
-            var category, action, label, val;
+        if(details.url.indexOf('google-analytics.com/collect') > -1 && getParameterByName(details.url, 't').toLowerCase() === 'event') {
+
+            referer = eventString = uacode = category = action = label = val = '<i>null</i>';
+
+            category = getParameterByName(details.url, 'ec');
+            action = getParameterByName(details.url, 'ea');
+            label = getParameterByName(details.url, 'el');
+            val = getParameterByName(details.url, 'ev');
+            uacode = getParameterByName(details.url, 'tid');
+            referer = getParameterByName(details.url, 'dl');
+
+            eventObject.push([referer, uacode, category, action, label, val]);
+            if(eventObject.length > 15) eventObject.shift();
+
+        } else if(details.url.indexOf('_utm') > -1) {
 
             referer = eventString = uacode = category = action = label = val = '<i>null</i>';
 
@@ -59,9 +73,10 @@
                     referer = details.requestHeaders[i].value;
                 }
             }
-            eventString = getParameterByName(details.url, 'utme')
+            eventString = getParameterByName(details.url, 'utme');
 
             if(eventString.substr(0,1) === '5') {
+
                 if(eventString.indexOf(')8(') > -1) eventString = eventString.substring(0, eventString.indexOf(')8(') + 1);
                 if(eventString.indexOf(')9(') > -1) eventString = eventString.substring(0, eventString.indexOf(')9(') + 1);
                 if(eventString.indexOf(')11(') > -1) eventString = eventString.substring(0, eventString.indexOf(')11(') + 1);
@@ -76,6 +91,8 @@
                 }
                 uacode = getParameterByName(details.url, 'utmac');
                 eventObject.push([referer, uacode, category, action, label, val]);
+                if(eventObject.length > 15) eventObject.shift();
+
             }
         }
         return {requestHeaders: details.requestHeaders};
