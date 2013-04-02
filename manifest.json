@@ -5,7 +5,7 @@
 	"description": "Plugin to track GA Event Tracker event calls that persists across pages",
 	"browser_action": {
 	    "default_icon": "ett.png",
-	    "popup": "popup.html"
+	    "default_popup": "popup.html"
   	},
   	"icons": {
   		"16": "ett16.png",
@@ -13,7 +13,7 @@
   		"128": "ett.png"
   	},
 	"background": {
-		"scripts": ["background.html"],
+		"scripts": ["background.js"],
 		"persistent": true
 	},
 	"permissions": [

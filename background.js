@@ -1,4 +1,4 @@
-<script>
+
     // Array to hold callback functions
     var callbacks = []; 
     var eventObject = [];
@@ -42,7 +42,6 @@
     }); 
     chrome.webRequest.onBeforeSendHeaders.addListener(
       function(details) {
-        console.log(details);
         var referer, eventString, uacode;
         var category, action, label, val;
         for (var i = 0; i < details.requestHeaders.length; ++i) {
@@ -64,8 +63,9 @@
 
             eventObject.push([referer, uacode, category, action, label, val]);
             if(eventObject.length > 15) eventObject.shift();
-
-        } else if(details.url.indexOf('_utm') > -1) {
+            console.log(eventObject);
+        }
+        if(details.url.indexOf('_utm') > -1) {
 
             referer = eventString = uacode = category = action = label = val = '<i>null</i>';
 
@@ -93,6 +93,7 @@
                 uacode = getParameterByName(details.url, 'utmac');
                 eventObject.push([referer, uacode, category, action, label, val]);
                 if(eventObject.length > 15) eventObject.shift();
+                console.log(eventObject);
 
             }
         }
@@ -101,4 +102,3 @@
       {urls: ["<all_urls>"]},
       ["requestHeaders"]
     );
-</script>
