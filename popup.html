@@ -37,15 +37,40 @@
 	tr:nth-child(odd) td {
 		background-color: #eeeeee;
 	}
+
+	.wrapit td.url {
+		white-space: normal;
+		max-width: 250px;
+		word-wrap: break-word;
+	}
+	td .full {
+		display: none;
+	}
+	td .compact {
+		display: inline;
+	}
+	.wrapit td .full {
+		display: inline;
+	}
+	.wrapit td .compact {
+		display: none;
+	}
+	.harr {
+		font-weight: 800;
+		color: #aaaaff;
+	}
+	.wrapit .harr {
+		color: #0000dd;
+	}
 	</style>
     <script src="popup.js"></script>
 </head>
 <body>
 	<h1>Google Events</h1>
-	<table>
+	<table id="event-table">
 		<thead>
 			<tr>
-				<th>URL</th>
+				<th><a href="#" id="expander">URL <span class="harr">&harr;</span></a></th>
 				<th>UA String</th>
 				<th>Category</th>
 				<th>Action</th>
