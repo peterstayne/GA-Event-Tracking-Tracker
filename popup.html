@@ -14,6 +14,10 @@
 		padding: 4px;
 		margin: 4px;
 	}
+	h1 span {
+		font-size: 14px;
+		color: #448866;
+	}
 	th {
 		font-size: 14px;
 		color: #444444;
@@ -30,6 +34,12 @@
 		white-space: nowrap;
 		padding: 4px;
 		margin: 4px;
+	}
+	td.no-results {
+		padding: 20px;
+	}
+	td p {
+		margin: 5px 0;
 	}
 	tr:nth-child(even) td {
 		background-color: #eeeeff;
@@ -62,11 +72,54 @@
 	.wrapit .harr {
 		color: #0000dd;
 	}
+	#event-table {
+		min-width: 450px;
+	}
+	tfoot th {
+		text-align: right;
+	}
+	.control-panel {
+		position: absolute;
+		right: 5px;
+		top: 5px;
+		text-align: right;
+	}
+	.control-panel a {
+		display: inline-block;
+		vertical-align: middle;
+		font-size: 14px;
+		text-decoration: none;
+		border: 2px solid #ccccee;
+		padding: 2px 8px;
+		height: 22px;
+		line-height: 22px;
+		text-align: center;
+		width: 45px;
+		box-shadow: -2px 2px 2px #eeeeff;
+	}
+	.control-panel a:hover {
+		border: 2px solid #9999bb;
+		box-shadow: -2px 2px 2px #ccccee;
+	}
+	.control-panel a:active {
+		border: 2px solid #666688;
+		box-shadow: inset -2px 2px 2px #ccccee;
+	}
+	#reset-list {
+		color: #f00;
+	}
+	#export-list {
+		color: #080;
+	}
 	</style>
     <script src="popup.js"></script>
 </head>
 <body>
-	<h1>Google Events</h1>
+	<h1>Event Tracking Tracker <span>v1.1</span></h1>
+	<div class="control-panel">
+		<a href="#" id="export-list" title="Export List to .csv">.CSV</a>
+		<a href="#" id="reset-list" title="Reset List">RESET</a>
+	</div>
 	<table id="event-table">
 		<thead>
 			<tr>
@@ -80,7 +133,9 @@
 		</thead>
 		<tbody id="event-list">
 			<tr>
-				<td colspan="6" align="center"><i>Nothing Yet</i></td>
+				<td colspan="6" align="center">
+					<i>Nothing Yet</i>
+				</td>
 			</tr>
 		</tbody>
 	</table>

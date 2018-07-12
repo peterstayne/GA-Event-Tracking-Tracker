@@ -37,14 +37,14 @@
                         newhtml += '<td>' + bgeo[i][5] + '</td>';
                     newhtml += '</tr>';
                 }
-                newhtml += '<tr><td colspan="6" align="center"><a href="javascript:void(0)" id="reset-list">Reset List</a></td></tr>';
                 document.getElementById('event-list').innerHTML = newhtml;
-                document.getElementById('reset-list').onclick = function() {
-                    chrome.extension.getBackgroundPage().eventObject = [];
-                    updateList();
-                };
             } else {
-                newhtml = '<tr><td colspan="6" align="center"><i>Nothing Yet</i></td></tr>';
+                newhtml = '<tr><td colspan="6" align="center" class="no-results">';
+                newhtml += '<p><i>No events recorded yet.</i></p>';
+                newhtml += '<p><i><a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/events" target="_top">Google\'s Event documentation page</a></i></p>';
+                newhtml += '<p><i>Note: Some ad blockers like uBlock Origin block events from firing.</i></p>';
+                newhtml += '</td></tr>';
+
                 document.getElementById('event-list').innerHTML = newhtml;
             }
 
@@ -64,4 +64,12 @@
             };
             updateList();
             setInterval(updateList, 3000);
+            document.getElementById('reset-list').onclick = function() {
+                chrome.extension.getBackgroundPage().eventObject = [];
+                updateList();
+            };
+            document.getElementById('export-list').onclick = function() {
+                chrome.extension.getBackgroundPage().eventObject = [];
+                updateList();
+            };
         };
