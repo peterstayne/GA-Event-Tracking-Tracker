@@ -62,8 +62,7 @@
             referer = getParameterByName(details.url, 'dl');
 
             eventObject.push([referer, uacode, category, action, label, val]);
-            if(eventObject.length > 15) eventObject.shift();
-            console.log(eventObject);
+            if(eventObject.length > 25) eventObject.shift();
         }
         if(details.url.indexOf('_utm') > -1) {
 
