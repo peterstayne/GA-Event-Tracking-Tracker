@@ -24,6 +24,8 @@
                 for(var i = bgeo.length-1; i > countUntil; i--) {
                     if(bgeo[i][0].length > 37) {
                         dispURL = bgeo[i][0].substr(0, 32) + ' ...';
+                    } else {
+                        dispURL = bgeo[i][0];
                     }
                     newhtml += '<tr class="entry">';
                         newhtml += '<td class="url">';
