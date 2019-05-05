@@ -42,6 +42,7 @@
     }); 
     chrome.webRequest.onBeforeSendHeaders.addListener(
       function(details) {
+        console.log(details)
         var referer, eventString, uacode;
         var category, action, label, val;
         for (var i = 0; i < details.requestHeaders.length; ++i) {
@@ -52,8 +53,9 @@
         }
         if(details.url.indexOf('google-analytics.com/collect') > -1 && getParameterByName(details.url, 't').toLowerCase() === 'event') {
 
-            referer = eventString = uacode = category = action = label = val = '<i>null</i>';
+            referer = tabid = eventString = uacode = category = action = label = val = '<i>null</i>';
 
+            tabid = details.tabId;
             category = getParameterByName(details.url, 'ec');
             action = getParameterByName(details.url, 'ea');
             label = getParameterByName(details.url, 'el');
@@ -61,7 +63,7 @@
             uacode = getParameterByName(details.url, 'tid');
             referer = getParameterByName(details.url, 'dl');
 
-            eventObject.push([referer, uacode, category, action, label, val]);
+            eventObject.push([referer, uacode, category, action, label, val, tabid]);
             if(eventObject.length > 25) eventObject.shift();
         }
         if(details.url.indexOf('_utm') > -1) {

@@ -111,33 +111,66 @@
 	#export-list {
 		color: #080;
 	}
+	.tab {
+		display: inline-block;
+		width: 159px;
+		background-color: #ddd;
+		padding: 5px 5px 5px 20px;
+		font-size: 14px;
+		position: relative;
+		border-top-left-radius: 4px;
+		border-top-right-radius: 4px;
+		border-top: 2px solid #9999bb;
+		border-left: 2px solid #9999bb;
+		border-right: 2px solid #9999bb;
+		margin-left: 5px;
+		height: 19px;
+	}
+	.tab.active {
+		background-color: #fff;
+	}
+	.tabs {
+		margin-top: 4px;
+		z-index: 1;
+	}
+	.content {
+		border-top: 2px solid #9999bb;
+	}
 	</style>
     <script src="popup.js"></script>
 </head>
 <body>
 	<h1>Event Tracking Tracker <span>v1.1</span></h1>
 	<div class="control-panel">
-		<a href="#" id="export-list" title="Export List to .csv">.CSV</a>
+		<a href="#" id="export-list" title="Export List to .xls">.XLS</a>
 		<a href="#" id="reset-list" title="Reset List">RESET</a>
 	</div>
-	<table id="event-table">
-		<thead>
-			<tr>
-				<th><a href="#" id="expander">URL <span class="harr">&harr;</span></a></th>
-				<th>UA String</th>
-				<th>Category</th>
-				<th>Action</th>
-				<th>Label</th>
-				<th>Value</th>
-			</tr>
-		</thead>
-		<tbody id="event-list">
-			<tr>
-				<td colspan="6" align="center">
-					<i>Nothing Yet</i>
-				</td>
-			</tr>
-		</tbody>
-	</table>
+	<div class="container">
+		<div class="tabs">
+			<a href="#" class="tab active all-tabs">All Tabs</a>
+			<a href="#" class="tab this-tab">This Tab</a>
+		</div>
+		<div class="content">
+			<table id="event-table">
+				<thead>
+					<tr>
+						<th><a href="#" id="expander">URL <span class="harr">&harr;</span></a></th>
+						<th>UA String</th>
+						<th>Category</th>
+						<th>Action</th>
+						<th>Label</th>
+						<th>Value</th>
+					</tr>
+				</thead>
+				<tbody id="event-list">
+					<tr>
+						<td colspan="6" align="center">
+							<i>Nothing Yet</i>
+						</td>
+					</tr>
+				</tbody>
+			</table>
+		</div>
+	</div>
 </body>
 </html>
