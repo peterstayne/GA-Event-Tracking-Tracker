@@ -1,7 +1,35 @@
 
     // Array to hold callback functions
-    var callbacks = []; 
-    var eventObject = [];
+    // var callbacks = []; 
+    // var eventObject = [];
+
+    function getEvents() {
+        // let gw = chrome.extension.getViews()[0];
+        // let data = gw.localStorage['ette'];
+        // if(!data) {
+        //     data = JSON.parse(data);
+        // } else {
+        //     data = [];
+        // }
+        return chrome.extension.local.get(['ette']);
+        // return data;
+    }
+
+    function saveEvents(events) {
+        // let gw = chrome.extension.getViews()[0];
+        // gw.localStorage['ette'] = JSON.stringify(events);
+        // return events;
+        return chrome.storage.local.set({ ette: events });
+    }
+
+    function addEvent(pushData) {
+        // let gd = getEvents();
+        // gd.push(pushData);
+        // saveEvents(gd);
+        // return pushData;
+        getEvents().then((result) => { result.push(pushData); saveEvents(pushData); })
+    }
+
     /**
      * Credit
      * http://stackoverflow.com/questions/901115/get-query-string-values-in-javascript/901144#901144
@@ -25,16 +53,18 @@
     { 
         // Add the callback to the queue
         callbacks.push(callback); 
-
+        console.log('in here');
         // Injects the content script into the current page 
         chrome.tabs.executeScript(null, { file: "content_script.js" }); 
     }; 
+
 
     // Perform the callback when a request is received from the content script
     chrome.extension.onRequest.addListener(function(request) 
     { 
         // Get the first callback in the callbacks array
         // and remove it from the array
+        console.log('orq', request);
         var callback = callbacks.shift();
 
         // Call the callback function
@@ -42,7 +72,7 @@
     }); 
     chrome.webRequest.onBeforeSendHeaders.addListener(
       function(details) {
-        console.log(details)
+        console.log('obsh', details)
         var referer, eventString, uacode;
         var category, action, label, val;
         for (var i = 0; i < details.requestHeaders.length; ++i) {
@@ -63,8 +93,8 @@
             uacode = getParameterByName(details.url, 'tid');
             referer = getParameterByName(details.url, 'dl');
 
-            eventObject.push([referer, uacode, category, action, label, val, tabid]);
-            if(eventObject.length > 25) eventObject.shift();
+            addEvent([referer, uacode, category, action, label, val, tabid]);
+            // if(eventObject.length > 25) eventObject.shift();
         }
         if(details.url.indexOf('_utm') > -1) {
 
@@ -92,9 +122,9 @@
                     }
                 }
                 uacode = getParameterByName(details.url, 'utmac');
-                eventObject.push([referer, uacode, category, action, label, val]);
-                if(eventObject.length > 15) eventObject.shift();
-                console.log(eventObject);
+                addEvent([referer, uacode, category, action, label, val]);
+                // if(eventObject.length > 15) eventObject.shift();
+                // console.log(eventObject);
 
             }
         }
