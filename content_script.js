@@ -5,5 +5,6 @@ var pageInfo = {
     "summary": window.getSelection().toString()
 };
 
+console.log(pageInfo);
 // Send the information back to the extension
-chrome.extension.sendRequest(pageInfo);
+chrome.runtime.sendMessage(pageInfo);

@@ -15,7 +15,7 @@
             chrome.storage.local.get('etev').then((bgeo) => {
 
                 // var bgeo = getEvents();
-                console.log('bgeo', bgeo);
+                // console.log('bgeo', bgeo);
                 var newhtml = '';
                 var dispURL = '';
                 if(bgeo.length) {

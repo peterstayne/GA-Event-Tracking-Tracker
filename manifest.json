@@ -13,7 +13,7 @@
   		"128": "ett.png"
   	},
 	"background": {
-		"service.worker": ["background.js"]
+		"service_worker": "background.js"
 	},
 	"host_permissions": [
         "http://*/*", 

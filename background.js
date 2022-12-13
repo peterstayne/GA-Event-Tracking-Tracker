@@ -58,9 +58,8 @@
         chrome.tabs.executeScript(null, { file: "content_script.js" }); 
     }; 
 
-
     // Perform the callback when a request is received from the content script
-    chrome.extension.onRequest.addListener(function(request) 
+    chrome.runtime.onMessage.addListener(function(request) 
     { 
         // Get the first callback in the callbacks array
         // and remove it from the array
@@ -72,7 +71,7 @@
     }); 
     chrome.webRequest.onBeforeSendHeaders.addListener(
       function(details) {
-        console.log('obsh', details)
+        console.log('obsh', details.url, details)
         var referer, eventString, uacode;
         var category, action, label, val;
         for (var i = 0; i < details.requestHeaders.length; ++i) {
@@ -96,6 +95,21 @@
             addEvent([referer, uacode, category, action, label, val, tabid]);
             // if(eventObject.length > 25) eventObject.shift();
         }
+        if(details.url.indexOf('google-analytics.com/g/collect') > -1 && getParameterByName(details.url, 't').toLowerCase() === 'event') {
+            referer = tabid = eventString = uacode = category = action = label = val = '<i>null</i>';
+
+            tabid = details.tabId;
+            category = getParameterByName(details.url, 'en');
+            action = getParameterByName(details.url, 'ea');
+            label = getParameterByName(details.url, 'el');
+            val = getParameterByName(details.url, 'ev');
+            uacode = getParameterByName(details.url, 'tid');
+            referer = getParameterByName(details.url, 'dl');
+
+            addEvent([referer, uacode, category, action, label, val, tabid]);
+            // if(eventObject.length > 25) eventObject.shift();
+        }
+
         if(details.url.indexOf('_utm') > -1) {
 
             referer = eventString = uacode = category = action = label = val = '<i>null</i>';
@@ -133,3 +147,42 @@
       {urls: ["<all_urls>"]},
       ["requestHeaders"]
     );
+
+/*
+
+https://www.google-analytics.com/g/collect?
+v=2
+&
+tid=G-MG2R3W5D76
+&
+gtm=2oebu0
+&
+_p=1087094531
+&
+cid=1641160515.1670773322
+&
+ul=en-us
+&
+sr=1920x1080
+&
+_s=3
+&
+sid=1670960899
+&
+sct=6
+&
+seg=1
+&
+dl=http%3A%2F%2Fpetemilkman.com%2F
+&
+dt=pete%20milkman%20.%20com
+&
+en=topmenu
+&
+_ee=1
+&
+ep.label=experiments
+&
+_et=10487
+
+*/
