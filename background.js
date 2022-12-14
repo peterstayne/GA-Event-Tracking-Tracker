@@ -4,30 +4,22 @@
     // var eventObject = [];
 
     function getEvents() {
-        // let gw = chrome.extension.getViews()[0];
-        // let data = gw.localStorage['ette'];
-        // if(!data) {
-        //     data = JSON.parse(data);
-        // } else {
-        //     data = [];
-        // }
-        return chrome.extension.local.get(['ette']);
-        // return data;
+        return chrome.storage.local.get('gae');
     }
 
     function saveEvents(events) {
-        // let gw = chrome.extension.getViews()[0];
-        // gw.localStorage['ette'] = JSON.stringify(events);
-        // return events;
-        return chrome.storage.local.set({ ette: events });
+        return chrome.storage.local.set({ 'gae': { eventlist: events }});
     }
 
     function addEvent(pushData) {
-        // let gd = getEvents();
-        // gd.push(pushData);
-        // saveEvents(gd);
-        // return pushData;
-        getEvents().then((result) => { result.push(pushData); saveEvents(pushData); })
+        getEvents().then((result) => { 
+            console.log('result', result);
+            if(typeof result.eventlist === 'undefined') {
+                result.eventlist = [];
+            }
+            result.eventlist.push(pushData); 
+            saveEvents(result.eventlist); 
+        });
     }
 
     /**
@@ -71,7 +63,6 @@
     }); 
     chrome.webRequest.onBeforeSendHeaders.addListener(
       function(details) {
-        console.log('obsh', details.url, details)
         var referer, eventString, uacode;
         var category, action, label, val;
         for (var i = 0; i < details.requestHeaders.length; ++i) {
@@ -95,17 +86,33 @@
             addEvent([referer, uacode, category, action, label, val, tabid]);
             // if(eventObject.length > 25) eventObject.shift();
         }
-        if(details.url.indexOf('google-analytics.com/g/collect') > -1 && getParameterByName(details.url, 't').toLowerCase() === 'event') {
-            referer = tabid = eventString = uacode = category = action = label = val = '<i>null</i>';
+        if(details.url.indexOf('google-analytics.com/g/collect') > -1 && getParameterByName(details.url, '_ee') == 1) {
+            console.log('obsh', details.url, details)
+            referer = tabid = eventString = property = uacode = category = action = label = val = '<i>null</i>';
+
+            let ps = new URLSearchParams(details.url);
+            let evp = {};
+
+            for (const key of ps.keys()) {
+                if(key.substr(0,3) == 'ep.') {
+                    evp[key.substr(3)] = ps.get(key);
+                }
+                if(key.substr(0,4) == 'epn.') {
+                    evp[key.substr(4)] = ps.get(key) + 0;
+                }
+            }
+            console.log('evp', evp)
 
             tabid = details.tabId;
             category = getParameterByName(details.url, 'en');
-            action = getParameterByName(details.url, 'ea');
-            label = getParameterByName(details.url, 'el');
-            val = getParameterByName(details.url, 'ev');
+            // action = getParameterByName(details.url, 'ea');
+            // label = getParameterByName(details.url, 'el');
+            val = JSON.stringify(evp);
             uacode = getParameterByName(details.url, 'tid');
+            property = getParameterByName(details.url, 'dt');
             referer = getParameterByName(details.url, 'dl');
 
+            // console.log(ps.keys());
             addEvent([referer, uacode, category, action, label, val, tabid]);
             // if(eventObject.length > 25) eventObject.shift();
         }

@@ -12,10 +12,12 @@
 
         function updateList() {
             // console.log(chrome.storage.local);
-            chrome.storage.local.get('etev').then((bgeo) => {
+            chrome.storage.local.get('gae').then((result) => {
 
+                let bgeo = result.eventlist;
+                if(!bgeo) bgeo = [];
                 // var bgeo = getEvents();
-                // console.log('bgeo', bgeo);
+                console.log('bgeo', bgeo);
                 var newhtml = '';
                 var dispURL = '';
                 if(bgeo.length) {
