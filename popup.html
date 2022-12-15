@@ -125,9 +125,12 @@
 		border-right: 2px solid #9999bb;
 		margin-left: 5px;
 		height: 19px;
+		transform: translate(0, 2px);
+		border-bottom: 2px solid #9999bb;
 	}
 	.tab.active {
 		background-color: #fff;
+		border-bottom-color: #fff;
 	}
 	.tabs {
 		margin-top: 4px;
@@ -142,16 +145,16 @@
 <body>
 	<h1>Event Tracking Tracker <span>v1.1</span></h1>
 	<div class="control-panel">
-		<a href="#" id="export-list" title="Export List to .xls">.XLS</a>
+		<!-- <a href="#" id="export-list" title="Export List to .xls">.XLS</a> -->
 		<a href="#" id="reset-list" title="Reset List">RESET</a>
 	</div>
 	<div class="container">
 		<div class="tabs">
-			<a href="#" class="tab active all-tabs">All Tabs</a>
-			<a href="#" class="tab this-tab">This Tab</a>
+			<a href="#" class="tab active all-tabs" id="all-tabs">All Tabs</a>
+			<a href="#" class="tab this-tab" id="this-tab">This Tab</a>
 		</div>
 		<div class="content">
-			<table id="event-table">
+			<table id="event-table" tabfilter="all">
 				<thead>
 					<tr>
 						<th><a href="#" id="expander">URL <span class="harr">&harr;</span></a></th>

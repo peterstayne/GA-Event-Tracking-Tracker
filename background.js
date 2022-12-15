@@ -13,12 +13,12 @@
 
     function addEvent(pushData) {
         getEvents().then((result) => { 
-            console.log('result', result);
-            if(typeof result.eventlist === 'undefined') {
-                result.eventlist = [];
+            // console.log('result', result);
+            if(typeof result.gae.eventlist === 'undefined') {
+                result.gae.eventlist = [];
             }
-            result.eventlist.push(pushData); 
-            saveEvents(result.eventlist); 
+            result.gae.eventlist.push(pushData); 
+            saveEvents(result.gae.eventlist); 
         });
     }
 
@@ -45,7 +45,7 @@
     { 
         // Add the callback to the queue
         callbacks.push(callback); 
-        console.log('in here');
+        // console.log('in here');
         // Injects the content script into the current page 
         chrome.tabs.executeScript(null, { file: "content_script.js" }); 
     }; 
@@ -55,7 +55,7 @@
     { 
         // Get the first callback in the callbacks array
         // and remove it from the array
-        console.log('orq', request);
+        // console.log('orq', request);
         var callback = callbacks.shift();
 
         // Call the callback function
@@ -86,8 +86,8 @@
             addEvent([referer, uacode, category, action, label, val, tabid]);
             // if(eventObject.length > 25) eventObject.shift();
         }
-        if(details.url.indexOf('google-analytics.com/g/collect') > -1 && getParameterByName(details.url, '_ee') == 1) {
-            console.log('obsh', details.url, details)
+        if(details.url.indexOf('google-analytics.com/g/collect') > -1 && getParameterByName(details.url, '_ee') == 1 && getParameterByName(details.url, 'en') != 'page_view') {
+            // console.log('obsh', details.url, details)
             referer = tabid = eventString = property = uacode = category = action = label = val = '<i>null</i>';
 
             let ps = new URLSearchParams(details.url);
@@ -101,7 +101,7 @@
                     evp[key.substr(4)] = ps.get(key) + 0;
                 }
             }
-            console.log('evp', evp)
+            // console.log('evp', evp)
 
             tabid = details.tabId;
             category = getParameterByName(details.url, 'en');
