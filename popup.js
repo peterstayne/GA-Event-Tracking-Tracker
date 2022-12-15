@@ -113,8 +113,8 @@
                 document.getElementById('this-tab').classList.remove('active');
                 updateList();
             };
-            document.getElementById('export-list').onclick = function() {
-                chrome.extension.getBackgroundPage().eventObject = [];
-                updateList();
-            };
+            // document.getElementById('export-list').onclick = function() {
+            //     chrome.extension.getBackgroundPage().eventObject = [];
+            //     updateList();
+            // };
         };

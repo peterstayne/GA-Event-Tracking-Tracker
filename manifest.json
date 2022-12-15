@@ -21,7 +21,6 @@
 	],
 	"permissions": [
 		"webRequest",
-		"storage",
-        "tabs"
+		"storage"
     ]
 }
