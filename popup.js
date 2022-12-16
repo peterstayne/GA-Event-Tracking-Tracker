@@ -60,9 +60,13 @@
         function updateList() {
             // console.log(chrome.storage.local);
             chrome.storage.local.get('gae').then((result) => {
-                // console.log('gae', result);
-                let bgeo = result.gae.eventlist;
-                if(!bgeo) bgeo = [];
+                // console.log('gaeu', result);
+                let bgeo = [];
+                if(typeof result.gae != 'undefined' && typeof result.gae.eventlist != 'undefined') {
+                    bgeo = result.gae.eventlist;
+                } else {
+                    // console.log('result is blank');
+                }
                 // var bgeo = getEvents();
                 var table = document.getElementById('event-table');
                 var tabfilter = table.getAttribute('tabfilter');

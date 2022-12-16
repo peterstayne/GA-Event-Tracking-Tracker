@@ -14,6 +14,9 @@
     function addEvent(pushData) {
         getEvents().then((result) => { 
             // console.log('result', result);
+            if(typeof result.gae == 'undefined') {
+                result.gae = { 'eventlist': [] };
+            }
             if(typeof result.gae.eventlist === 'undefined') {
                 result.gae.eventlist = [];
             }
