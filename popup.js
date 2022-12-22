@@ -10,6 +10,28 @@
             return false;
         }
 
+        function createCSV(bgeo, tabfilter) {
+           if(bgeo.length) {
+                var csv = 'URL,UA String,Category,Action,Label,Value,TabID' + "\n";
+                var countUntil;
+                if(bgeo.length > 100) {
+                    countUntil = bgeo.length - 100;
+                } else {
+                    countUntil = -1;
+                }
+                for(var i = bgeo.length-1; i > countUntil; i--) {
+                    if(tabfilter != 'all' && bgeo[i][6] != tabfilter) continue;
+                    csv += '"' + bgeo[i].join('","') + '"' + "\n";
+                }
+                var hiddenElement = document.createElement('a');  
+                hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);  
+                hiddenElement.target = '_blank';  
+                  
+                //provide the name for the CSV file to be downloaded  
+                hiddenElement.download = 'EventTrackingTracker.csv';  
+                hiddenElement.click();  
+           }
+        }
 
         function updateTable(bgeo, tabfilter) {
             var newhtml = '';
@@ -17,8 +39,8 @@
             var numRows = 0;
             if(bgeo.length) {
                 var countUntil;
-                if(bgeo.length > 15) {
-                    countUntil = bgeo.length - 15;
+                if(bgeo.length > 100) {
+                    countUntil = bgeo.length - 100;
                 } else {
                     countUntil = -1;
                 }
@@ -50,37 +72,51 @@
             if(!numRows) {
                 newhtml = '<tr><td colspan="6" align="center" class="no-results">';
                 newhtml += '<p><i>No events recorded yet.</i></p>';
-                newhtml += '<p><i><a href="https://developers.google.com/analytics/devguides/collection/analyticsjs/events" target="_top">Google\'s Event documentation page</a></i></p>';
+                newhtml += '<p><i><a href="https://support.google.com/analytics/answer/9322688?hl=en&ref_topic=9756175" target="_blank">Google\'s Event documentation page</a></i></p>';
                 newhtml += '<p><i>Note: Some ad blockers like uBlock Origin block events from firing.</i></p>';
                 newhtml += '</td></tr>';
             }
             document.getElementById('event-list').innerHTML = newhtml;            
         }
 
-        function updateList() {
-            // console.log(chrome.storage.local);
-            chrome.storage.local.get('gae').then((result) => {
-                // console.log('gaeu', result);
-                let bgeo = [];
-                if(typeof result.gae != 'undefined' && typeof result.gae.eventlist != 'undefined') {
-                    bgeo = result.gae.eventlist;
-                } else {
-                    // console.log('result is blank');
-                }
-                // var bgeo = getEvents();
-                var table = document.getElementById('event-table');
-                var tabfilter = table.getAttribute('tabfilter');
-                // console.log('bgeo', bgeo);
+        async function updateList(target = "web") {
+            let bgeo = [];
+            let tabfilter = 'all-tabs';
+            let result = await readLocalStorage('gae');
+            let prefs = await readLocalStorage('prefs');
+            if(typeof result.eventlist != 'undefined') {
+                bgeo = result.eventlist;
+            }
+            if(typeof prefs != 'undefined' && typeof prefs.tabfilter != 'undefined') {
+                tabfilter = prefs.tabfilter;
 
-                if(tabfilter == 'all') {
+            }
+            if(tabfilter == 'all-tabs') {
+                if(target == 'web') {
                     updateTable(bgeo, 'all');
-                } else {
-                    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                      var currTab = tabs[0];
-                      if (currTab) { // Sanity check
+                } else if(target == 'csv') {
+                    createCSV(bgeo, 'all');
+                }
+            } else {
+                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+                  var currTab = tabs[0];
+                  if (currTab) { // Sanity check
+                    if(target == 'web') {
                         updateTable(bgeo, currTab.id);
-                      }
-                    });                    
+                    } else if(target == 'csv') {
+                        createCSV(bgeo, currTab.id);
+                    }
+                  }
+                });                    
+            }
+        }
+
+        function switchTab(tabid) {
+            document.querySelectorAll('.tab').forEach(function(i,a) {
+                if(i.id != tabid) {
+                    i.classList.remove('active');
+                } else {
+                    i.classList.add('active');
                 }
             });
         }
@@ -93,32 +129,49 @@
                 var tableClasses = table.classList;
                 if(tableClasses.contains('wrapit')) {
                     tableClasses.remove('wrapit');
+                    chrome.storage.local.set({ 'prefs': { expander: 'unexpanded' }});
                 } else {
                     tableClasses.add('wrapit');
+                    chrome.storage.local.set({ 'prefs': { expander: 'expanded' }});
                 }
             };
             updateList();
-            setInterval(updateList, 3000);
+            setInterval(updateList, 5000);
             document.getElementById('reset-list').onclick = function() {
                 chrome.storage.local.set({ 'gae': { eventlist: [] }});
                 updateList();
             };
             document.getElementById('this-tab').onclick = function() {
-                var table = document.getElementById('event-table');
-                table.setAttribute('tabfilter', 'this');
-                this.classList.add('active');
-                document.getElementById('all-tabs').classList.remove('active');
+                switchTab('this-tab');
+                chrome.storage.local.set({ 'prefs': { tabfilter: 'this-tab' }});
                 updateList();
             };
             document.getElementById('all-tabs').onclick = function() {
-                var table = document.getElementById('event-table');
-                table.setAttribute('tabfilter', 'all');
-                this.classList.add('active');
-                document.getElementById('this-tab').classList.remove('active');
+                switchTab('all-tabs');
+                chrome.storage.local.set({ 'prefs': { tabfilter: 'all-tabs' }});
                 updateList();
             };
-            // document.getElementById('export-list').onclick = function() {
-            //     chrome.extension.getBackgroundPage().eventObject = [];
-            //     updateList();
-            // };
+            document.getElementById('export-list').onclick = function() {
+                updateList('csv');
+            };
+            chrome.storage.local.get(['prefs'], function (result) {
+                if(typeof result.prefs != 'undefined') {
+                    if(typeof result.prefs.tabfilter != 'undefined') {
+                        switchTab(result.prefs.tabfilter);
+                    }
+                    if(typeof result.prefs.expander != 'undefined') {
+                        if(result.prefs.expander == 'expanded') {
+                            document.getElementById('event-table').classList.add('wrapit');
+                        }
+                    }
+                }
+            });
         };
+
+  const readLocalStorage = async (key) => {
+    return new Promise((resolve, reject) => {
+      chrome.storage.local.get([key], function (result) {
+          resolve(result[key]);
+      });
+    });
+  };

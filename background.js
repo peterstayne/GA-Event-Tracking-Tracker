@@ -20,6 +20,9 @@
             if(typeof result.gae.eventlist === 'undefined') {
                 result.gae.eventlist = [];
             }
+            if(result.gae.eventlist.length > 100) {
+                result.gae.eventlist.shift();
+            }
             result.gae.eventlist.push(pushData); 
             saveEvents(result.gae.eventlist); 
         });

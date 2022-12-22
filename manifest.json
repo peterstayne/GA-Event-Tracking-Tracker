@@ -1,6 +1,6 @@
 {
 	"name": "Event Tracking Tracker",
-	"version": "1.1.1",
+	"version": "1.1.2",
 	"manifest_version": 3,
 	"description": "Plugin to track GA Event Tracker event calls that persists across pages",
 	"action": {
