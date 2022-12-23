@@ -20,6 +20,7 @@
                 }
                 let cols = {};
                 for(var i = bgeo.length-1; i > countUntil; i--) {
+                    if(typeof bgeo[i].data === 'undefined') continue;
                     if(tabfilter != 'all' && bgeo[i].tabid != tabfilter) continue;
                     Object.keys(bgeo[i].data).forEach(function(k) {
                         if(k != 'Category') cols[k] = true;
@@ -33,8 +34,9 @@
                 csv+= "\n";
 
                 for(let i = bgeo.length-1; i > countUntil; i--) {
+                     if(typeof bgeo[i].data === 'undefined') continue;
                     if(tabfilter != 'all' && bgeo[i].tabid != tabfilter) continue;
-                    csv += bgeo[i].referer + ",";
+                   csv += bgeo[i].referer + ",";
                     csv += bgeo[i].uacode + ",";
                     csv += bgeo[i].ts + ",";
                     csv += '"' + bgeo[i].data.Category + '"';
@@ -69,6 +71,7 @@
                 }
                 let cols = {};
                 for(var i = bgeo.length-1; i > countUntil; i--) {
+                    if(typeof bgeo[i].data === 'undefined') continue;
                     if(tabfilter != 'all' && bgeo[i].tabid != tabfilter) continue;
                     numRows+=1;
                     Object.keys(bgeo[i].data).forEach(function(k) {
@@ -89,8 +92,9 @@
                 document.getElementById('event-list-head').innerHTML = evhead;
 
                 for(var i = bgeo.length-1; i > countUntil; i--) {
+                     if(typeof bgeo[i].data === 'undefined') continue;
                     if(tabfilter != 'all' && bgeo[i].tabid != tabfilter) continue;
-                    if(bgeo[i].referer.length > 37) {
+                   if(bgeo[i].referer.length > 37) {
                         dispURL = bgeo[i].referer.substr(0, 32) + ' ...';
                     } else {
                         dispURL = bgeo[i].referer;
@@ -214,6 +218,18 @@
                     }
                 }
             });
+            // document.getElementById('alwaysontop').onchange = function() {
+            //     var alwaysOnTop;
+            //     if(this.checked) { 
+            //         alwaysOnTop = false;
+            //     } else {
+            //         alwaysOnTop = true;
+            //     }
+            //     chrome.storage.local.get(['cw'], function (result) {
+            //         console.log(result);
+            //         result.cw.alwaysOnTop = alwaysOnTop;
+            //     });
+            // };
         };
 
   const readLocalStorage = async (key) => {

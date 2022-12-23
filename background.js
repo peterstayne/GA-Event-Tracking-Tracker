@@ -202,28 +202,34 @@
     );
 
 var vid = 3333;
+var cw = false;
 
 chrome.action.onClicked.addListener(function(tab) {
-    // console.log('vid', vid);
-        chrome.windows.get(vid, function(chromeWindow) {
-            // console.log('loop cw', chromeWindow);
-            if (!chrome.runtime.lastError && chromeWindow) {
-                chrome.windows.update(vid, {focused: true});
-                // console.log('vid found!');
-                return;
-            } else {
-                chrome.windows.create({
-                    // Just use the full URL if you need to open an external page
-                    url: chrome.runtime.getURL("popup.html"),
-                    type: "popup",
-                    width: 700,
-                    height: 300
-                }, function(chromeWindow) {
-                    vid = chromeWindow.id;
-                    // console.log('chromewindow', chromeWindow);
-                });
-            }
-        });
+    chrome.storage.local.get(['cw'], function (result) {
+        console.log('win res', result);
+        if(typeof result.cw !== 'undefined' && typeof result.cw.id != 'undefined') {
+            chrome.windows.get(result.cw.id, function(chromeWindow) {
+                // console.log('loop cw', chromeWindow);
+                if (!chrome.runtime.lastError && chromeWindow) {
+                    chrome.windows.update(vid, {focused: true});
+                    // console.log('vid found!');
+                    return;
+                } else {
+                    chrome.windows.create({
+                        // Just use the full URL if you need to open an external page
+                        url: chrome.runtime.getURL("popup.html"),
+                        type: "popup",
+                        width: 720,
+                        height: 320
+                    }, function(chromeWindow) {
+                        vid = chromeWindow.id;
+                        chrome.storage.local.set({ 'cw': chromeWindow });
+                        console.log('chromewindow', chromeWindow);
+                    });
+                }
+            });
+        }
+    });
 });
 
 /*
