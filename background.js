@@ -23,6 +23,14 @@
             if(result.gae.eventlist.length > 100) {
                 result.gae.eventlist.shift();
             }
+            let today = new Date();
+            let hrs = today.getHours();
+            let ampm = 'am';
+            if(hrs > 12) {
+                hrs -= 12;
+                ampm = 'pm';
+            }
+            pushData.ts = hrs + ":" + today.getMinutes() + ":" + today.getSeconds() + ampm;
             result.gae.eventlist.push(pushData); 
             saveEvents(result.gae.eventlist); 
         });
@@ -89,7 +97,18 @@
             uacode = getParameterByName(details.url, 'tid');
             referer = getParameterByName(details.url, 'dl');
 
-            addEvent([referer, uacode, category, action, label, val, tabid]);
+            let ev = {
+                tabid: tabid,
+                uacode: uacode,
+                referer: referer,
+                data: {
+                    Category: category,
+                    Action: action,
+                    Label: label,
+                    Value: val
+                }
+            };
+            addEvent(ev);
             // if(eventObject.length > 25) eventObject.shift();
         }
         if(details.url.indexOf('google-analytics.com/g/collect') > -1 && getParameterByName(details.url, '_ee') == 1 && getParameterByName(details.url, 'en') != 'page_view') {
@@ -102,6 +121,9 @@
             for (const key of ps.keys()) {
                 if(key.substr(0,3) == 'ep.') {
                     evp[key.substr(3)] = ps.get(key);
+                }
+                if(key.substr(0,3) == 'en') {
+                    evp['Category'] = ps.get(key);
                 }
                 if(key.substr(0,4) == 'epn.') {
                     evp[key.substr(4)] = ps.get(key) + 0;
@@ -118,8 +140,15 @@
             property = getParameterByName(details.url, 'dt');
             referer = getParameterByName(details.url, 'dl');
 
+            let ev = {
+                tabid: tabid,
+                uacode: uacode,
+                referer: referer,
+                data: evp
+            };
+
             // console.log(ps.keys());
-            addEvent([referer, uacode, category, action, label, val, tabid]);
+            addEvent(ev);
             // if(eventObject.length > 25) eventObject.shift();
         }
 
@@ -149,7 +178,18 @@
                     }
                 }
                 uacode = getParameterByName(details.url, 'utmac');
-                addEvent([referer, uacode, category, action, label, val]);
+                let ev = {
+                    tabid: tabid,
+                    uacode: uacode,
+                    referer: referer,
+                    data: {
+                        Category: category,
+                        Action: action,
+                        Label: label,
+                        Value: val
+                    }
+                };
+                addEvent(ev);
                 // if(eventObject.length > 15) eventObject.shift();
                 // console.log(eventObject);
 
@@ -160,6 +200,31 @@
       {urls: ["<all_urls>"]},
       ["requestHeaders"]
     );
+
+var vid = 3333;
+
+chrome.action.onClicked.addListener(function(tab) {
+    // console.log('vid', vid);
+        chrome.windows.get(vid, function(chromeWindow) {
+            // console.log('loop cw', chromeWindow);
+            if (!chrome.runtime.lastError && chromeWindow) {
+                chrome.windows.update(vid, {focused: true});
+                // console.log('vid found!');
+                return;
+            } else {
+                chrome.windows.create({
+                    // Just use the full URL if you need to open an external page
+                    url: chrome.runtime.getURL("popup.html"),
+                    type: "popup",
+                    width: 700,
+                    height: 300
+                }, function(chromeWindow) {
+                    vid = chromeWindow.id;
+                    // console.log('chromewindow', chromeWindow);
+                });
+            }
+        });
+});
 
 /*
 

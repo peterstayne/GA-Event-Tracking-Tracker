@@ -12,24 +12,47 @@
 
         function createCSV(bgeo, tabfilter) {
            if(bgeo.length) {
-                var csv = 'URL,UA String,Category,Action,Label,Value,TabID' + "\n";
-                var countUntil;
+                let countUntil;
                 if(bgeo.length > 100) {
                     countUntil = bgeo.length - 100;
                 } else {
                     countUntil = -1;
                 }
+                let cols = {};
                 for(var i = bgeo.length-1; i > countUntil; i--) {
-                    if(tabfilter != 'all' && bgeo[i][6] != tabfilter) continue;
-                    csv += '"' + bgeo[i].join('","') + '"' + "\n";
+                    if(tabfilter != 'all' && bgeo[i].tabid != tabfilter) continue;
+                    Object.keys(bgeo[i].data).forEach(function(k) {
+                        if(k != 'Category') cols[k] = true;
+                    });
                 }
-                var hiddenElement = document.createElement('a');  
-                hiddenElement.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);  
-                hiddenElement.target = '_blank';  
-                  
-                //provide the name for the CSV file to be downloaded  
-                hiddenElement.download = 'EventTrackingTracker.csv';  
-                hiddenElement.click();  
+                let colnames = Object.keys(cols);
+                let csv = 'URL,UA String,Time,Category';
+                colnames.forEach(function(cname) {
+                    csv+= ',"' + cname + '"';
+                });
+                csv+= "\n";
+
+                for(let i = bgeo.length-1; i > countUntil; i--) {
+                    if(tabfilter != 'all' && bgeo[i].tabid != tabfilter) continue;
+                    csv += bgeo[i].referer + ",";
+                    csv += bgeo[i].uacode + ",";
+                    csv += bgeo[i].ts + ",";
+                    csv += '"' + bgeo[i].data.Category + '"';
+
+                    colnames.forEach(function(cname) {
+                        if(bgeo[i].data[cname]) {
+                            csv += ',"' + bgeo[i].data[cname] + '"';
+                        } else {
+                            csv += ',';
+                        }
+                    });
+                    csv += "\n";
+                }
+                let he = document.createElement('a');  
+                he.href = 'data:text/csv;charset=utf-8,' + encodeURI(csv);  
+                he.target = '_blank';  
+                he.download = 'EventTrackingTracker.csv';  
+                he.click();  
            }
         }
 
@@ -44,33 +67,54 @@
                 } else {
                     countUntil = -1;
                 }
+                let cols = {};
                 for(var i = bgeo.length-1; i > countUntil; i--) {
-                    if(tabfilter != 'all' && bgeo[i][6] != tabfilter) continue;
+                    if(tabfilter != 'all' && bgeo[i].tabid != tabfilter) continue;
                     numRows+=1;
-                    if(bgeo[i][0].length > 37) {
-                        dispURL = bgeo[i][0].substr(0, 32) + ' ...';
+                    Object.keys(bgeo[i].data).forEach(function(k) {
+                        if(k != 'Category') cols[k] = true;
+                    });
+                }                
+                let colnames = Object.keys(cols);
+                // console.log(colnames, cols);
+                let evhead = '<tr>';
+                    evhead+= '<th><a href="#" id="expander">URL <span class="harr">&harr;</span></a></th>';
+                    evhead+= '<th>UA String</th>';
+                    evhead+= '<th>Time</th>';
+                    evhead+= '<th>Category</th>';
+                    colnames.forEach(function(cname) {
+                        evhead+= '<th>' + cname + '</th>';
+                    });
+                    evhead+= '</tr>';
+                document.getElementById('event-list-head').innerHTML = evhead;
+
+                for(var i = bgeo.length-1; i > countUntil; i--) {
+                    if(tabfilter != 'all' && bgeo[i].tabid != tabfilter) continue;
+                    if(bgeo[i].referer.length > 37) {
+                        dispURL = bgeo[i].referer.substr(0, 32) + ' ...';
                     } else {
-                        dispURL = bgeo[i][0];
+                        dispURL = bgeo[i].referer;
                     }
                     newhtml += '<tr class="entry">';
                         newhtml += '<td class="url">';
                             newhtml += '<span class="compact">' + dispURL + '</span>';
-                            newhtml += '<span class="full">' + bgeo[i][0] + '</span>';
+                            newhtml += '<span class="full">' + bgeo[i].referer + '</span>';
                         newhtml += '</td>';
-                        newhtml += '<td class="uastring">' + bgeo[i][1] + '</td>';
-                        newhtml += '<td>' + bgeo[i][2] + '</td>';
-                        if(bgeo[i][3] == '<i>null</i>' && bgeo[i][4] == '<i>null</i>' && bgeo[i][5] != '<i>null</i>') {
-                            newhtml += '<td colspan="3">' + bgeo[i][5] + '</td>';
-                        } else {
-                            newhtml += '<td>' + bgeo[i][3] + '</td>';
-                            newhtml += '<td>' + bgeo[i][4] + '</td>';
-                            newhtml += '<td>' + bgeo[i][5] + '</td>';
-                        }
+                        newhtml += '<td class="uastring">' + bgeo[i].uacode + '</td>';
+                        newhtml += '<td class="uastring">' + bgeo[i].ts + '</td>';
+                        newhtml += '<td class="category">' + bgeo[i].data.Category + '</td>';
+                        colnames.forEach(function(cname) {
+                            if(bgeo[i].data[cname]) {
+                                newhtml += '<td>' + bgeo[i].data[cname] + '</td>';
+                            } else {
+                                newhtml += '<td>&nbsp;</td>';
+                            }
+                        });
                     newhtml += '</tr>';
                 }
             }
             if(!numRows) {
-                newhtml = '<tr><td colspan="6" align="center" class="no-results">';
+                newhtml = '<tr><td colspan="100%" align="center" class="no-results">';
                 newhtml += '<p><i>No events recorded yet.</i></p>';
                 newhtml += '<p><i><a href="https://support.google.com/analytics/answer/9322688?hl=en&ref_topic=9756175" target="_blank">Google\'s Event documentation page</a></i></p>';
                 newhtml += '<p><i>Note: Some ad blockers like uBlock Origin block events from firing.</i></p>';
@@ -83,13 +127,12 @@
             let bgeo = [];
             let tabfilter = 'all-tabs';
             let result = await readLocalStorage('gae');
-            let prefs = await readLocalStorage('prefs');
+            let prefs_tab = await readLocalStorage('prefs_tab');
             if(typeof result.eventlist != 'undefined') {
                 bgeo = result.eventlist;
             }
-            if(typeof prefs != 'undefined' && typeof prefs.tabfilter != 'undefined') {
-                tabfilter = prefs.tabfilter;
-
+            if(typeof prefs_tab != 'undefined' && typeof prefs_tab != 'undefined') {
+                tabfilter = prefs_tab;
             }
             if(tabfilter == 'all-tabs') {
                 if(target == 'web') {
@@ -124,15 +167,20 @@
         // Call the getPageInfo function in the background page, passing in 
         // our onPageInfo function as the callback
         window.onload = function() { 
-            document.getElementById('expander').onclick = function() {
-                var table = document.getElementById('event-table');
-                var tableClasses = table.classList;
-                if(tableClasses.contains('wrapit')) {
-                    tableClasses.remove('wrapit');
-                    chrome.storage.local.set({ 'prefs': { expander: 'unexpanded' }});
-                } else {
-                    tableClasses.add('wrapit');
-                    chrome.storage.local.set({ 'prefs': { expander: 'expanded' }});
+            document.getElementById('event-table').onclick = function(e) {
+                for (var target=e.target; target && target!=this; target=target.parentNode) {
+                    if(target.matches('#expander')) {
+                        var table = document.getElementById('event-table');
+                        var tableClasses = table.classList;
+                        if(tableClasses.contains('wrapit')) {
+                            tableClasses.remove('wrapit');
+                            chrome.storage.local.set({ 'prefs_expander': 'unexpanded' });
+                        } else {
+                            tableClasses.add('wrapit');
+                            chrome.storage.local.set({ 'prefs_expander': 'expanded' });
+                        }
+                        updateList();
+                    }
                 }
             };
             updateList();
@@ -143,26 +191,26 @@
             };
             document.getElementById('this-tab').onclick = function() {
                 switchTab('this-tab');
-                chrome.storage.local.set({ 'prefs': { tabfilter: 'this-tab' }});
+                chrome.storage.local.set({ 'prefs_tab': 'this-tab' });
                 updateList();
             };
             document.getElementById('all-tabs').onclick = function() {
                 switchTab('all-tabs');
-                chrome.storage.local.set({ 'prefs': { tabfilter: 'all-tabs' }});
+                chrome.storage.local.set({ 'prefs_tab': 'all-tabs' });
                 updateList();
             };
             document.getElementById('export-list').onclick = function() {
                 updateList('csv');
             };
-            chrome.storage.local.get(['prefs'], function (result) {
-                if(typeof result.prefs != 'undefined') {
-                    if(typeof result.prefs.tabfilter != 'undefined') {
-                        switchTab(result.prefs.tabfilter);
-                    }
-                    if(typeof result.prefs.expander != 'undefined') {
-                        if(result.prefs.expander == 'expanded') {
-                            document.getElementById('event-table').classList.add('wrapit');
-                        }
+            chrome.storage.local.get(['prefs_tab'], function (result) {
+                if(typeof result.prefs_tab != 'undefined') {
+                    switchTab(result.prefs_tab);
+                }
+            });
+            chrome.storage.local.get(['prefs_expander'], function (result) {
+                if(typeof result.prefs_expander != 'undefined') {
+                    if(result.prefs_expander == 'expanded') {
+                        document.getElementById('event-table').classList.add('wrapit');
                     }
                 }
             });
