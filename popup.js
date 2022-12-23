@@ -92,9 +92,9 @@
                 document.getElementById('event-list-head').innerHTML = evhead;
 
                 for(var i = bgeo.length-1; i > countUntil; i--) {
-                     if(typeof bgeo[i].data === 'undefined') continue;
+                    if(typeof bgeo[i].data === 'undefined') continue;
                     if(tabfilter != 'all' && bgeo[i].tabid != tabfilter) continue;
-                   if(bgeo[i].referer.length > 37) {
+                    if(bgeo[i].referer.length > 37) {
                         dispURL = bgeo[i].referer.substr(0, 32) + ' ...';
                     } else {
                         dispURL = bgeo[i].referer;
@@ -132,12 +132,42 @@
             let tabfilter = 'all-tabs';
             let result = await readLocalStorage('gae');
             let prefs_tab = await readLocalStorage('prefs_tab');
-            if(typeof result.eventlist != 'undefined') {
+            if(typeof result != 'undefined' && typeof result.eventlist != 'undefined') {
                 bgeo = result.eventlist;
             }
             if(typeof prefs_tab != 'undefined' && typeof prefs_tab != 'undefined') {
                 tabfilter = prefs_tab;
             }
+            chrome.tabs.query({active: true}, function(tabs) {
+                // console.log('tabs', tabs);
+                var tabhtml = '<a href="#" class="tab ';
+                var found = false;
+                if(tabfilter == 'all-tabs') {
+                    tabhtml += 'active';
+                    found = true;
+                }
+                tabhtml += ' all-tabs" id="all-tabs">All Tabs</a>';
+                tabs.forEach(function(i) {
+                    if(i.url.substr(0,10) != 'chrome-ext') {
+                        let title = i.title;
+                        if(title.length > 20) title = title.substr(0,18) + '...'
+                        tabhtml += '<a href="#" class="tab ';
+                        if(tabfilter == i.id) {
+                            tabhtml += 'active ';
+                            found = true;
+                        }
+                        let fi = i.favIconUrl;
+                        if(!fi) {
+                            fi = 'NoImage.png'
+                        }
+                        tabhtml += 'one-tab" id="tab' + i.id + '" data-tabid="' + i.id + '"><img src="' + fi + '" width="16" height="16" /> ' + title + '</a>';
+                    }
+                });
+                document.getElementById('tabs-container').innerHTML = tabhtml;
+                if(!found) {
+                    chrome.storage.local.set({ 'prefs_tab': 'all-tabs' });
+                }
+            });
             if(tabfilter == 'all-tabs') {
                 if(target == 'web') {
                     updateTable(bgeo, 'all');
@@ -145,16 +175,11 @@
                     createCSV(bgeo, 'all');
                 }
             } else {
-                chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-                  var currTab = tabs[0];
-                  if (currTab) { // Sanity check
-                    if(target == 'web') {
-                        updateTable(bgeo, currTab.id);
-                    } else if(target == 'csv') {
-                        createCSV(bgeo, currTab.id);
-                    }
-                  }
-                });                    
+                if(target == 'web') {
+                    updateTable(bgeo, tabfilter);
+                } else if(target == 'csv') {
+                    createCSV(bgeo, tabfilter);
+                }
             }
         }
 
@@ -188,19 +213,24 @@
                 }
             };
             updateList();
-            setInterval(updateList, 5000);
+            setInterval(updateList, 3500);
             document.getElementById('reset-list').onclick = function() {
                 chrome.storage.local.set({ 'gae': { eventlist: [] }});
                 updateList();
             };
-            document.getElementById('this-tab').onclick = function() {
-                switchTab('this-tab');
-                chrome.storage.local.set({ 'prefs_tab': 'this-tab' });
-                updateList();
-            };
-            document.getElementById('all-tabs').onclick = function() {
-                switchTab('all-tabs');
-                chrome.storage.local.set({ 'prefs_tab': 'all-tabs' });
+            document.getElementById('tabs-container').onclick = function(e) {
+                // console.log(e.target);
+                for (var target=e.target; target && target!=this; target=target.parentNode) {
+                    if(target.matches('.tab')) {
+                        switchTab(target.id);
+                        break;
+                    }
+                }
+                if(target.id == 'all-tabs') {
+                    chrome.storage.local.set({ 'prefs_tab': 'all-tabs' });
+                } else {
+                    chrome.storage.local.set({ 'prefs_tab': target.dataset.tabid });
+                }
                 updateList();
             };
             document.getElementById('export-list').onclick = function() {
@@ -209,6 +239,8 @@
             chrome.storage.local.get(['prefs_tab'], function (result) {
                 if(typeof result.prefs_tab != 'undefined') {
                     switchTab(result.prefs_tab);
+                } else {
+                    chrome.storage.local.set({ 'prefs_tab': 'all-tabs' });
                 }
             });
             chrome.storage.local.get(['prefs_expander'], function (result) {
@@ -218,6 +250,11 @@
                     }
                 }
             });
+            chrome.storage.local.get(['prefs_width', 'prefs_height'], function (result) {
+                if(typeof result.prefs_width != 'undefined' && typeof result.prefs_height != 'undefined') {
+                    window.resizeTo(result.prefs_width, result.prefs_height);
+                }
+            });            
             // document.getElementById('alwaysontop').onchange = function() {
             //     var alwaysOnTop;
             //     if(this.checked) { 
@@ -231,7 +268,10 @@
             //     });
             // };
         };
-
+        window.onresize = function() {
+            chrome.storage.local.set({ 'prefs_width': window.innerWidth });
+            chrome.storage.local.set({ 'prefs_height': window.innerHeight });
+        }
   const readLocalStorage = async (key) => {
     return new Promise((resolve, reject) => {
       chrome.storage.local.get([key], function (result) {

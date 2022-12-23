@@ -1,6 +1,12 @@
 <html>
 <head>
 	<style>
+	html {
+	  box-sizing: border-box;
+	}
+	*, *:before, *:after {
+	  box-sizing: inherit;
+	}
 	* {
 		font-family: helvetica,sans-serif;
 		margin: 0;
@@ -39,7 +45,7 @@
 		overflow-wrap: anywhere;
 	}
 	td:nth-child(1) {
-		min-width: 130px;
+		min-width: 200px;
 	}
 	td.no-results {
 		padding: 20px;
@@ -98,10 +104,10 @@
 		text-decoration: none;
 		border: 2px solid #ccccee;
 		padding: 2px 8px;
-		height: 22px;
+		height: 28px;
 		line-height: 22px;
 		text-align: center;
-		width: 45px;
+		width: 65px;
 		box-shadow: -2px 2px 2px #eeeeff;
 	}
 	.control-panel a:hover {
@@ -122,7 +128,7 @@
 		display: inline-block;
 		width: 159px;
 		background-color: #ddd;
-		padding: 5px 5px 5px 20px;
+		padding: 4px 5px 4px 4px;
 		font-size: 14px;
 		position: relative;
 		border-top-left-radius: 4px;
@@ -131,17 +137,23 @@
 		border-left: 2px solid #9999bb;
 		border-right: 2px solid #9999bb;
 		margin-left: 5px;
-		height: 19px;
-		transform: translate(0, 2px);
+		height: 29px;
 		border-bottom: 2px solid #9999bb;
+		z-index: 999;
 	}
 	.tab.active {
 		background-color: #fff;
-		border-bottom-color: #fff;
+		border-bottom: 2px solid #fff;
 	}
 	.tabs {
 		margin-top: 4px;
 		z-index: 1;
+		overflow: hidden;
+		white-space: nowrap;
+		transform: translate(0, 2px);
+	}
+	.tabs img {
+		vertical-align: middle;
 	}
 	.content {
 		border-top: 2px solid #9999bb;
@@ -150,16 +162,16 @@
     <script src="popup.js"></script>
 </head>
 <body>
-	<h1>Event Tracking Tracker <span>v1.1.3</span></h1>
+	<h1>Event Tracking Tracker <span>v1.1.4</span></h1>
 	<div class="control-panel">
 		<!-- <label for="alwaysontop">Always on top <input type="checkbox" id="alwaysontop" name="alwaysontop" /></label> -->
 		<a href="#" id="export-list" title="Export List to .xls">.CSV</a>
 		<a href="#" id="reset-list" title="Reset List">RESET</a>
 	</div>
 	<div class="container">
-		<div class="tabs">
+		<div class="tabs" id="tabs-container">
 			<a href="#" class="tab active all-tabs" id="all-tabs">All Tabs</a>
-			<a href="#" class="tab this-tab" id="this-tab">This Tab</a>
+			<!-- <a href="#" class="tab this-tab" id="this-tab">This Tab</a> -->
 		</div>
 		<div class="content">
 			<table id="event-table" tabfilter="all">
