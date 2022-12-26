@@ -132,10 +132,10 @@
             let tabfilter = 'all-tabs';
             let result = await readLocalStorage('gae');
             let prefs_tab = await readLocalStorage('prefs_tab');
-            if(typeof result != 'undefined' && typeof result.eventlist != 'undefined') {
+            if(typeof result != 'undefined' && result && typeof result.eventlist != 'undefined') {
                 bgeo = result.eventlist;
             }
-            if(typeof prefs_tab != 'undefined' && typeof prefs_tab != 'undefined') {
+            if(typeof prefs_tab != 'undefined') {
                 tabfilter = prefs_tab;
             }
             chrome.tabs.query({active: true}, function(tabs) {
