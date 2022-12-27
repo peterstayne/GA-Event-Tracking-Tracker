@@ -132,13 +132,19 @@
             let tabfilter = 'all-tabs';
             let result = await readLocalStorage('gae');
             let prefs_tab = await readLocalStorage('prefs_tab');
+            let tabids = [];
             if(typeof result != 'undefined' && result && typeof result.eventlist != 'undefined') {
                 bgeo = result.eventlist;
+                bgeo.forEach(function(ev) {
+                    if(ev.tabid) {
+                        tabids.push(ev.tabid);
+                    }
+                });
             }
             if(typeof prefs_tab != 'undefined') {
                 tabfilter = prefs_tab;
             }
-            chrome.tabs.query({active: true}, function(tabs) {
+            chrome.tabs.query({}, function(tabs) {
                 // console.log('tabs', tabs);
                 var tabhtml = '<a href="#" class="tab ';
                 var found = false;
@@ -148,7 +154,13 @@
                 }
                 tabhtml += ' all-tabs" id="all-tabs">All Tabs</a>';
                 tabs.forEach(function(i) {
-                    if(i.url.substr(0,10) != 'chrome-ext') {
+                                    // console.log('tabids', i.tabid, tabids, i);
+
+                    if(!i.active && tabids.indexOf(i.id) === -1) {
+                        return;
+                    }
+                    // console.log(i);
+                    if(typeof i.url != 'undefined' && i.url && i.url.substr(0,10) != 'chrome-ext') {
                         let title = i.title;
                         if(title.length > 20) title = title.substr(0,18) + '...'
                         tabhtml += '<a href="#" class="tab ';
