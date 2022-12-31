@@ -1,18 +1,9 @@
-
-    // Array to hold callback functions
-    // var callbacks = []; 
-    // var eventObject = [];
-
-    function getEvents() {
-        return chrome.storage.local.get('gae');
-    }
-
     function saveEvents(events) {
         return chrome.storage.local.set({ 'gae': { eventlist: events }});
     }
 
     function addEvent(pushData) {
-        getEvents().then((result) => { 
+        chrome.storage.local.get('gae', (result) => { 
             // console.log('result', result);
             if(typeof result.gae == 'undefined') {
                 result.gae = { 'eventlist': [] };
