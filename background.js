@@ -45,16 +45,6 @@
         }
     }
 
-    // This function is called onload in the popup code
-    function getPageInfo(callback) 
-    { 
-        // Add the callback to the queue
-        callbacks.push(callback); 
-        // console.log('in here');
-        // Injects the content script into the current page 
-        chrome.tabs.executeScript(null, { file: "content_script.js" }); 
-    }; 
-
     // Perform the callback when a request is received from the content script
     chrome.runtime.onMessage.addListener(function(request) 
     { 
